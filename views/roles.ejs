@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+<div class="page-head"><h1>Roles &amp; permissions</h1><div class="sub">Roles are bundles of permissions. The app checks permissions, never role names.</div></div>
+
+<% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+<div class="two-col">
+  <div class="card">
+    <h2>Existing roles</h2>
+    <% roles.forEach(r => { %>
+      <div style="margin-bottom:14px;">
+        <div style="font-weight:600;"><%= r.name %><% if (r.is_admin_role) { %> <span class="perm-pill">built-in admin</span><% } %></div>
+        <div style="margin-top:4px;">
+          <% (rolePerms[r.id] || []).forEach(p => { %><span class="perm-pill"><%= p %></span><% }) %>
+          <% if (!(rolePerms[r.id] || []).length) { %><span class="empty" style="padding:0;">no permissions assigned</span><% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="card">
+    <h2>Create a role</h2>
+    <form method="POST" action="/admin/roles">
+      <div class="field"><label>Role name</label><input name="name" required placeholder="e.g. Ops Lead"></div>
+      <div class="field">
+        <label>Permissions</label>
+        <ul class="checklist">
+          <% perms.forEach(p => { %>
+            <li><label><input type="checkbox" name="permissions" value="<%= p.key %>"> <code><%= p.key %></code> — <%= p.description %></label></li>
+          <% }) %>
+        </ul>
+      </div>
+      <button class="btn amber" type="submit">Create role</button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

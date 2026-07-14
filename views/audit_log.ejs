@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+
+<div class="page-head"><h1>Audit log</h1><div class="sub">Org admin view — permission-denied attempts and load events touching your org</div></div>
+
+<div class="two-col">
+  <div class="card">
+    <h2>Load events</h2>
+    <% if (!loadEvents.length) { %><div class="empty">No events yet.</div><% } %>
+    <% loadEvents.forEach(a => { %>
+      <div class="audit-item">
+        <div class="event"><%= a.reference %> · <%= a.event %></div>
+        <% if (a.from_value || a.to_value) { %><div><%= a.from_value || '—' %> → <%= a.to_value || '—' %></div><% } %>
+        <% if (a.note) { %><div><%= a.note %></div><% } %>
+        <div class="meta"><%= a.actor_name || 'system' %> · <%= new Date(a.created_at).toLocaleString() %></div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="card">
+    <h2>Permission-denied attempts (system-wide)</h2>
+    <% if (!denied.length) { %><div class="empty">None logged.</div><% } %>
+    <% denied.forEach(d => { %>
+      <div class="audit-item">
+        <div class="event"><%= d.method %> <%= d.path %></div>
+        <div><%= d.reason %></div>
+        <div class="meta"><%= d.email || 'anonymous' %> · <%= new Date(d.created_at).toLocaleString() %></div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+<div class="page-head"><h1>Compliance record</h1><div class="sub">Insurance, authority, and equipment/commodity approvals used for auto-flagging</div></div>
+
+<% if (saved) { %><div class="alert ok">Compliance record saved.</div><% } %>
+<% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+<div class="card" style="max-width:640px;">
+  <form method="POST" action="/compliance">
+    <div class="grid grid-3">
+      <div class="field"><label>MC number</label><input name="mc_number" value="<%= record ? record.mc_number : '' %>"></div>
+      <div class="field"><label>DOT number</label><input name="dot_number" value="<%= record ? record.dot_number : '' %>"></div>
+      <div class="field">
+        <label>Authority status</label>
+        <select name="authority_status">
+          <% ['active','pending','revoked'].forEach(s => { %>
+            <option value="<%= s %>" <%= record && record.authority_status===s ? 'selected' : '' %>><%= s %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Insurance expiry</label>
+      <input type="date" name="insurance_expiry" required value="<%= record ? record.insurance_expiry : '' %>">
+    </div>
+    <div class="field">
+      <label>Approved equipment</label>
+      <% const equip = record ? JSON.parse(record.approved_equipment || '[]') : []; %>
+      <label style="font-weight:400;"><input type="checkbox" name="approved_equipment" value="dry_van" <%= equip.includes('dry_van')?'checked':'' %>> Dry van</label>
+      <label style="font-weight:400;margin-left:14px;"><input type="checkbox" name="approved_equipment" value="reefer" <%= equip.includes('reefer')?'checked':'' %>> Reefer</label>
+      <label style="font-weight:400;margin-left:14px;"><input type="checkbox" name="approved_equipment" value="flatbed" <%= equip.includes('flatbed')?'checked':'' %>> Flatbed</label>
+    </div>
+    <div class="field">
+      <label>Approved commodities (comma-separated)</label>
+      <input name="approved_commodities" value="<%= record ? JSON.parse(record.approved_commodities||'[]').join(', ') : '' %>" placeholder="general, frozen_foods">
+    </div>
+    <button class="btn amber" type="submit">Save compliance record</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>
