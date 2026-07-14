@@ -178,7 +178,7 @@ routes to them (in particular, a real bug was caught and fixed this way —
 an early version of the staff-management router accidentally applied its
 "broker/carrier only" middleware to *every* route in the app because it was
 registered without a path prefix, which silently 403'd shippers out of
-their own load pages; found via the curl regression pass and fixed by
-scoping the middleware to `/admin`). Commit history reflects incremental
-build order: schema → RBAC/middleware → routes → views → styling → bugfix
-→ docs.
+their own load pages; found and fixed via the curl regression pass below,
+before the routes were committed, by scoping the middleware to `/admin`).
+Commit history reflects incremental build order: schema → RBAC/middleware
+→ routes → views → styling → docs.
