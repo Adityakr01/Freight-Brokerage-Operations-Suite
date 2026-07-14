@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoadFlow</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app-shell">
+  <% if (typeof user !== 'undefined' && user) { %>
+  <div class="sidebar">
+    <div class="brand">Load<span class="dot">Flow</span></div>
+    <div class="brand-sub">Freight Ops</div>
+
+    <div class="nav-group">
+      <div class="nav-label">Overview</div>
+      <a class="nav-link <%= currentPath==='/dashboard' ? 'active' : '' %>" href="/dashboard">Dashboard</a>
+    </div>
+
+    <% if (user.account_type === 'broker') { %>
+      <div class="nav-group">
+        <div class="nav-label">Broker</div>
+        <a class="nav-link <%= currentPath==='/loads' ? 'active' : '' %>" href="/loads">Load Board</a>
+        <% if (perms.includes('load.create')) { %><a class="nav-link" href="/loads/new">Post a Load</a><% } %>
+      </div>
+    <% } %>
+
+    <% if (user.account_type === 'carrier') { %>
+      <div class="nav-group">
+        <div class="nav-label">Carrier</div>
+        <% if (perms.includes('compliance.manage')) { %><a class="nav-link <%= currentPath==='/compliance' ? 'active' : '' %>" href="/compliance">Compliance Record</a><% } %>
+      </div>
+    <% } %>
+
+    <% if (perms.includes('staff.manage')) { %>
+      <div class="nav-group">
+        <div class="nav-label">Admin</div>
+        <a class="nav-link <%= currentPath==='/admin/staff' ? 'active' : '' %>" href="/admin/staff">Staff</a>
+        <a class="nav-link <%= currentPath==='/admin/roles' ? 'active' : '' %>" href="/admin/roles">Roles &amp; Permissions</a>
+      </div>
+    <% } %>
+
+    <% if (user.is_org_admin) { %>
+      <div class="nav-group">
+        <a class="nav-link <%= currentPath==='/admin/audit-log' ? 'active' : '' %>" href="/admin/audit-log">Audit Log</a>
+      </div>
+    <% } %>
+
+    <div class="who">
+      <strong><%= user.name %></strong>
+      <%= user.account_type.charAt(0).toUpperCase() + user.account_type.slice(1) %><% if (typeof roleName !== 'undefined' && roleName) { %> · <%= roleName %><% } %>
+      <form method="POST" action="/logout"><button type="submit">Sign out</button></form>
+    </div>
+  </div>
+  <% } %>
+  <div class="main">

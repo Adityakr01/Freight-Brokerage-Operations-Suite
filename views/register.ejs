@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create shipper account · LoadFlow</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>Load<span class="dot">Flow</span></h1>
+    <div class="tag">Create a shipper account</div>
+
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+    <form method="POST" action="/register">
+      <div class="field">
+        <label for="name">Your name</label>
+        <input id="name" name="name" required autofocus>
+      </div>
+      <div class="field">
+        <label for="company">Company (optional)</label>
+        <input id="company" name="company">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required minlength="6">
+      </div>
+      <button class="btn amber" type="submit" style="width:100%;padding:10px;">Create account</button>
+    </form>
+
+    <p style="font-size:12.5px;margin-top:14px;">
+      Already have an account? <a href="/login">Sign in</a><br>
+      Broker or carrier staff are added by your org admin, not self-registration.
+    </p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in · LoadFlow</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>Load<span class="dot">Flow</span></h1>
+    <div class="tag">Freight brokerage operations</div>
+
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+    <form method="POST" action="/login">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required>
+      </div>
+      <button class="btn amber" type="submit" style="width:100%;padding:10px;">Sign in</button>
+    </form>
+
+    <p style="font-size:12.5px;margin-top:14px;">Shipper? <a href="/register">Create a shipper account</a></p>
+
+    <div class="demo-box">
+      <div><strong>Demo logins</strong> (password: Password123!)</div>
+      <div>Broker admin&nbsp; — admin@summitfreight.test</div>
+      <div>Broker staff&nbsp; — dispatcher@summitfreight.test</div>
+      <div>Carrier admin — admin@ironhide.test</div>
+      <div>Carrier driver — driver@ironhide.test</div>
+      <div>Flagged carrier admin — admin@redline.test</div>
+      <div>Shipper&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; — ops@brightgoods.test</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
