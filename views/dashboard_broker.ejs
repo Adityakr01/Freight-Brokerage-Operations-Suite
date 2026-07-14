@@ -1,0 +1,61 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Broker dashboard</h1>
+    <div class="sub">Summit Freight Brokerage · your org's loads only</div>
+  </div>
+  <% if (perms.includes('load.create')) { %><a class="btn amber" href="/loads/new">+ Post a load</a><% } %>
+</div>
+
+<% if (flagged.length) { %>
+  <div class="flag-banner">
+    <strong><%= flagged.length %> load<%= flagged.length>1?'s':'' %> blocked by a compliance flag</strong>
+    A carrier's insurance, authority, or equipment approval doesn't meet requirements. Progression past "Carrier Assigned" is blocked until resolved.
+    <div style="margin-top:8px;">
+      <% flagged.forEach(l => { %>
+        <a href="/loads/<%= l.id %>" class="perm-pill"><%= l.reference %> — <%= l.carrier_org_name %></a>
+      <% }) %>
+    </div>
+  </div>
+<% } %>
+
+<div class="grid grid-4" style="margin-bottom:20px;">
+  <% const order = ['Posted','Carrier Assigned','Rate Confirmed','Dispatched','In Transit','Delivered','POD Verified','Invoiced/Closed'];
+     const countMap = {}; counts.forEach(c => countMap[c.status] = c.c); %>
+  <% order.forEach(s => { %>
+    <div class="stat">
+      <div class="n"><%= countMap[s] || 0 %></div>
+      <div class="l"><%= s %></div>
+    </div>
+  <% }) %>
+</div>
+
+<div class="card">
+  <h2>Recent loads</h2>
+  <% if (!loads.length) { %>
+    <div class="empty">No loads yet. Post your first load to get started.</div>
+  <% } else { %>
+  <table>
+    <thead><tr><th>Ref</th><th>Lane</th><th>Carrier</th><th>Shipper</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <% loads.forEach(l => { %>
+        <tr>
+          <td class="ref"><%= l.reference %></td>
+          <td><%= l.origin %> → <%= l.destination %></td>
+          <td><%= l.carrier_org_name || '—' %></td>
+          <td><%= l.shipper_name %></td>
+          <td>
+            <span class="badge st-<%= l.status.replace(/\s|\//g,'-') %>"><%= l.status %></span>
+            <% if (l.compliance_flag) { %><span class="badge flag">FLAGGED</span><% } %>
+          </td>
+          <td><a href="/loads/<%= l.id %>">View →</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+  <p style="margin-top:10px;"><a href="/loads">See full load board →</a></p>
+</div>
+
+<%- include('partials/footer') %>

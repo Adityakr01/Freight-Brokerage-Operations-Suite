@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Carrier dashboard</h1>
+    <div class="sub">Loads assigned to your carrier org only — not the full marketplace</div>
+  </div>
+</div>
+
+<% if (expiryWarning) { %>
+  <div class="flag-banner">
+    <% if (expiryWarning.level === 'expired') { %>
+      <strong>Insurance expired <%= Math.abs(expiryWarning.daysLeft) %> day<%= Math.abs(expiryWarning.daysLeft)!==1?'s':'' %> ago.</strong>
+      New load assignments will be auto-flagged until this is renewed.
+    <% } else { %>
+      <strong>Insurance expires in <%= expiryWarning.daysLeft %> day<%= expiryWarning.daysLeft!==1?'s':'' %>.</strong>
+      Renew soon to avoid new-assignment flags.
+    <% } %>
+    <% if (perms.includes('compliance.manage')) { %> <a href="/compliance">Update compliance record →</a><% } %>
+  </div>
+<% } %>
+
+<div class="card">
+  <h2>Your loads</h2>
+  <% if (!loads.length) { %>
+    <div class="empty">No loads assigned to your carrier yet.</div>
+  <% } else { %>
+  <table>
+    <thead><tr><th>Ref</th><th>Lane</th><th>Broker</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <% loads.forEach(l => { %>
+        <tr>
+          <td class="ref"><%= l.reference %></td>
+          <td><%= l.origin %> → <%= l.destination %></td>
+          <td><%= l.broker_org_name %></td>
+          <td>
+            <span class="badge st-<%= l.status.replace(/\s|\//g,'-') %>"><%= l.status %></span>
+            <% if (l.compliance_flag) { %><span class="badge flag">FLAGGED</span><% } %>
+          </td>
+          <td><a href="/loads/<%= l.id %>">Open →</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Your shipments</h1>
+    <div class="sub">Status and delivery confirmation for loads booked in your name</div>
+  </div>
+</div>
+
+<div class="card">
+  <% if (!loads.length) { %>
+    <div class="empty">No shipments yet. Your broker will add loads under your account once booked.</div>
+  <% } else { %>
+  <table>
+    <thead><tr><th>Ref</th><th>Lane</th><th>Broker</th><th>Carrier</th><th>Pickup</th><th>Delivery</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <% loads.forEach(l => { %>
+        <tr>
+          <td class="ref"><%= l.reference %></td>
+          <td><%= l.origin %> → <%= l.destination %></td>
+          <td><%= l.broker_org_name %></td>
+          <td><%= l.carrier_org_name || 'Not yet assigned' %></td>
+          <td><%= l.pickup_date || '—' %></td>
+          <td><%= l.delivery_date || '—' %></td>
+          <td><span class="badge st-<%= l.status.replace(/\s|\//g,'-') %>"><%= l.status %></span></td>
+          <td><a href="/loads/<%= l.id %>">View →</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
