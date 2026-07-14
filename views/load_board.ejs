@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Load board</h1>
+    <div class="sub"><%= loads.length %> load<%= loads.length!==1?'s':'' %><% if (flaggedCount) { %> · <span style="color:#b3412c;"><%= flaggedCount %> flagged</span><% } %></div>
+  </div>
+  <% if (perms.includes('load.create')) { %><a class="btn amber" href="/loads/new">+ Post a load</a><% } %>
+</div>
+
+<form class="filters" method="GET" action="/loads">
+  <input type="text" name="q" placeholder="Search ref, lane, commodity…" value="<%= filters.q || '' %>">
+  <select name="status">
+    <option value="">All statuses</option>
+    <% statuses.forEach(s => { %>
+      <option value="<%= s %>" <%= filters.status===s?'selected':'' %>><%= s %></option>
+    <% }) %>
+  </select>
+  <input type="text" name="carrier" placeholder="Carrier name" value="<%= filters.carrier || '' %>">
+  <button class="btn outline small" type="submit">Filter</button>
+  <a class="btn outline small" href="/loads">Clear</a>
+</form>
+
+<div class="card">
+  <% if (!loads.length) { %>
+    <div class="empty">No loads match those filters.</div>
+  <% } else { %>
+  <table>
+    <thead><tr><th>Ref</th><th>Lane</th><th>Shipper</th><th>Carrier</th><th>Equip</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <% loads.forEach(l => { %>
+        <tr>
+          <td class="ref"><%= l.reference %></td>
+          <td><%= l.origin %> → <%= l.destination %></td>
+          <td><%= l.shipper_name %></td>
+          <td><%= l.carrier_org_name || '—' %></td>
+          <td><%= l.equipment_type %></td>
+          <td>
+            <span class="badge st-<%= l.status.replace(/\s|\//g,'-') %>"><%= l.status %></span>
+            <% if (l.compliance_flag) { %><span class="badge flag">FLAGGED</span><% } %>
+          </td>
+          <td><a href="/loads/<%= l.id %>">Open →</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

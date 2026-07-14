@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+
+<div class="page-head"><h1>Post a load</h1></div>
+
+<% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+<div class="card" style="max-width:640px;">
+  <form method="POST" action="/loads">
+    <div class="grid grid-3">
+      <div class="field"><label>Origin</label><input name="origin" required placeholder="Dallas, TX"></div>
+      <div class="field"><label>Destination</label><input name="destination" required placeholder="Memphis, TN"></div>
+      <div class="field"><label>Shipper email</label><input type="email" name="shipper_email" required placeholder="ops@brightgoods.test"></div>
+    </div>
+    <div class="grid grid-3">
+      <div class="field"><label>Pickup date</label><input type="date" name="pickup_date"></div>
+      <div class="field"><label>Delivery date</label><input type="date" name="delivery_date"></div>
+      <div class="field">
+        <label>Equipment type</label>
+        <select name="equipment_type" required>
+          <option value="dry_van">Dry van</option>
+          <option value="reefer">Reefer</option>
+          <option value="flatbed">Flatbed</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Commodity</label>
+      <select name="commodity" required>
+        <option value="general">General freight</option>
+        <option value="frozen_foods">Frozen foods</option>
+        <option value="hazmat">Hazmat</option>
+      </select>
+      <div class="hint">Carrier's approved equipment/commodity list will be checked automatically once you assign a carrier.</div>
+    </div>
+    <button class="btn amber" type="submit">Post load</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

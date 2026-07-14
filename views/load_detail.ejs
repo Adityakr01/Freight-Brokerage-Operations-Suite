@@ -1,0 +1,166 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1 class="ref"><%= load.reference %> <span class="badge st-<%= load.status.replace(/\s|\//g,'-') %>"><%= load.status %></span></h1>
+    <div class="sub"><%= load.origin %> → <%= load.destination %> · <%= load.equipment_type %> / <%= load.commodity %></div>
+  </div>
+</div>
+
+<% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+<% if (load.compliance_flag) { %>
+  <div class="flag-banner">
+    <strong>Compliance flag — progression blocked</strong>
+    <%= load.compliance_flag_reason %>
+    <% if (perms.includes('load.override_compliance_flag')) { %>
+      <form method="POST" action="/loads/<%= load.id %>/override-compliance" style="margin-top:10px;">
+        <div class="field" style="margin-bottom:8px;">
+          <input name="note" placeholder="Justification for overriding this flag (required)" required style="max-width:420px;">
+        </div>
+        <button class="btn danger small" type="submit">Override flag &amp; take liability</button>
+      </form>
+    <% } %>
+  </div>
+<% } else if (load.compliance_override_by) { %>
+  <div class="alert warn"><strong>Compliance flag overridden.</strong> <%= load.compliance_override_note %></div>
+<% } %>
+
+<div class="two-col">
+  <div>
+    <div class="card">
+      <h2>Shipment</h2>
+      <table>
+        <tr><td style="width:160px;color:var(--gray);">Broker org</td><td><%= load.broker_org_name %></td></tr>
+        <tr><td style="color:var(--gray);">Shipper</td><td><%= load.shipper_name %></td></tr>
+        <tr><td style="color:var(--gray);">Carrier</td><td><%= load.carrier_org_name || 'Not yet assigned' %></td></tr>
+        <tr><td style="color:var(--gray);">Pickup</td><td><%= load.pickup_date || '—' %></td></tr>
+        <tr><td style="color:var(--gray);">Delivery</td><td><%= load.delivery_date || '—' %></td></tr>
+        <tr><td style="color:var(--gray);">POD</td><td>
+          <% if (load.pod_filename) { %><a href="/loads/<%= load.id %>/pod" target="_blank">Download POD →</a><% } else { %>—<% } %>
+        </td></tr>
+      </table>
+    </div>
+
+    <% if (user.account_type === 'broker' && load.status === 'Posted' && perms.includes('load.assign_carrier')) { %>
+    <div class="card">
+      <h2>Assign carrier</h2>
+      <form method="POST" action="/loads/<%= load.id %>/assign-carrier">
+        <div class="field">
+          <select name="carrier_org_id" required>
+            <option value="">Select a carrier…</option>
+            <% carriers.forEach(c => { %><option value="<%= c.id %>"><%= c.name %></option><% }) %>
+          </select>
+          <div class="hint">Compliance (insurance, authority, equipment/commodity approval) is checked automatically on assignment.</div>
+        </div>
+        <button class="btn amber" type="submit">Assign carrier</button>
+      </form>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'broker' && ['Carrier Assigned','Rate Confirmed'].includes(load.status) && perms.includes('rate.confirm')) { %>
+    <div class="card">
+      <h2>Rate confirmation</h2>
+      <% if (load.rateConfirmations.length) { %>
+        <table>
+          <thead><tr><th>Version</th><th>Base</th><th>Total</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+          <% load.rateConfirmations.forEach(rc => { %>
+            <tr>
+              <td>v<%= rc.version %></td>
+              <td>$<%= rc.base_rate.toFixed(2) %></td>
+              <td>$<%= rc.total.toFixed(2) %></td>
+              <td><%= rc.status %></td>
+              <td>
+                <% if (rc.status === 'draft') { %>
+                  <form class="inline" method="POST" action="/loads/<%= load.id %>/rate-confirmations/<%= rc.id %>/confirm">
+                    <button class="btn small amber" type="submit" <%= load.compliance_flag ? 'disabled title="Blocked by compliance flag"' : '' %>>Confirm</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+      <details style="margin-top:12px;">
+        <summary style="cursor:pointer;font-size:12.5px;font-weight:600;">+ New rate confirmation version</summary>
+        <form method="POST" action="/loads/<%= load.id %>/rate-confirmations" style="margin-top:10px;">
+          <div class="field"><label>Base rate ($)</label><input type="number" step="0.01" name="base_rate" required></div>
+          <div class="field">
+            <label>Accessorials (optional)</label>
+            <div class="grid grid-3" style="margin-bottom:6px;">
+              <input name="accessorial_labels" placeholder="Label e.g. detention">
+              <input type="number" step="0.01" name="accessorial_amounts" placeholder="Amount">
+              <span></span>
+            </div>
+          </div>
+          <button class="btn outline small" type="submit">Save as draft</button>
+        </form>
+      </details>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'broker' && load.status === 'Rate Confirmed' && perms.includes('load.assign_carrier')) { %>
+    <div class="card">
+      <h2>Dispatch</h2>
+      <form method="POST" action="/loads/<%= load.id %>/dispatch">
+        <button class="btn amber" type="submit" <%= load.compliance_flag ? 'disabled' : '' %>>Dispatch load</button>
+      </form>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'broker' && load.status === 'POD Verified' && perms.includes('rate.confirm')) { %>
+    <div class="card">
+      <h2>Invoice</h2>
+      <form method="POST" action="/loads/<%= load.id %>/close">
+        <button class="btn amber" type="submit">Mark invoiced / closed</button>
+      </form>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'carrier' && load.status === 'Carrier Assigned' && perms.includes('load.accept_decline')) { %>
+    <div class="card">
+      <h2>Assignment response</h2>
+      <form class="inline" method="POST" action="/loads/<%= load.id %>/accept"><button class="btn amber small" type="submit">Accept</button></form>
+      <form class="inline" method="POST" action="/loads/<%= load.id %>/decline" style="margin-left:8px;"><button class="btn outline small" type="submit">Decline</button></form>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'carrier' && ['Dispatched','In Transit'].includes(load.status) && perms.includes('load.update_status')) { %>
+    <div class="card">
+      <h2>Update status</h2>
+      <form method="POST" action="/loads/<%= load.id %>/advance-status">
+        <button class="btn amber" type="submit">Mark as <%= load.status === 'Dispatched' ? 'In Transit' : 'Delivered' %></button>
+      </form>
+    </div>
+    <% } %>
+
+    <% if (user.account_type === 'carrier' && load.status === 'Delivered' && perms.includes('pod.upload')) { %>
+    <div class="card">
+      <h2>Upload POD</h2>
+      <form method="POST" action="/loads/<%= load.id %>/pod">
+        <div class="field"><label>Delivery note</label><textarea name="pod_note" placeholder="Received by, condition, etc."></textarea></div>
+        <button class="btn amber" type="submit">Upload &amp; verify POD</button>
+      </form>
+    </div>
+    <% } %>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Audit trail</h2>
+      <% if (!load.audit.length) { %><div class="empty">No events yet.</div><% } %>
+      <% load.audit.forEach(a => { %>
+        <div class="audit-item">
+          <div class="event"><%= a.event %></div>
+          <% if (a.from_value || a.to_value) { %><div><%= a.from_value || '—' %> → <%= a.to_value || '—' %></div><% } %>
+          <% if (a.note) { %><div><%= a.note %></div><% } %>
+          <div class="meta"><%= a.actor_name || 'system' %> · <%= new Date(a.created_at).toLocaleString() %></div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
