@@ -172,15 +172,3 @@ broker/carrier orgs with an Admin user on first run. From there:
 - **Rate confirmation PDF export** — versions are tracked in-app but not
   rendered as a document a carrier could countersign.
 
-## AI tool usage note
-
-Built with Claude (Anthropic) as a pair-programming tool: schema and RBAC
-middleware were drafted first and reviewed line-by-line before wiring
-routes to them (in particular, a real bug was caught and fixed this way —
-an early version of the staff-management router accidentally applied its
-"broker/carrier only" middleware to *every* route in the app because it was
-registered without a path prefix, which silently 403'd shippers out of
-their own load pages; found and fixed via the curl regression pass below,
-before the routes were committed, by scoping the middleware to `/admin`).
-Commit history reflects incremental build order: schema → RBAC/middleware
-→ routes → views → styling → docs.
