@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+# Freight-Brokerage-Operations-Suite
+
+>>>>>>> 8f947abc4a82819a83eb08280b4bbbc27304bd7b
 # LoadFlow — Freight Brokerage Operations Suite
 
 A hackathon-scope operations platform for a freight brokerage: post loads, assign
@@ -170,6 +175,7 @@ broker/carrier orgs with an Admin user on first run. From there:
 - **Rate confirmation PDF export** — versions are tracked in-app but not
   rendered as a document a carrier could countersign.
 
+<<<<<<< HEAD
 ## AI tool usage note
 
 Built with Claude (Anthropic) as a pair-programming tool: schema and RBAC
@@ -182,3 +188,5 @@ their own load pages; found and fixed via the curl regression pass below,
 before the routes were committed, by scoping the middleware to `/admin`).
 Commit history reflects incremental build order: schema → RBAC/middleware
 → routes → views → styling → docs.
+=======
+>>>>>>> 8f947abc4a82819a83eb08280b4bbbc27304bd7b
