@@ -8,10 +8,12 @@ const db = require('./db'); // runs schema + bootstrap on require
 const { attachUser } = require('./middleware/auth');
 const { getPermissionsForUser } = require('./lib/rbac');
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
+
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(morgan('dev'));
